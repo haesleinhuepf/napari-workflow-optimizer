@@ -275,8 +275,6 @@ class JaccardLabelImageOptimizer(Optimizer):
         import numpy as np
         overlap = confusion_matrix(reference.ravel(), test.ravel())
 
-        num_labels = reference.max()
-
         # Measure correctly labeled pixels
         n_pixels_pred = np.sum(overlap, axis=0, keepdims=True)
         n_pixels_true = np.sum(overlap, axis=1, keepdims=True)
@@ -287,7 +285,7 @@ class JaccardLabelImageOptimizer(Optimizer):
 
         max_jacc = iou.max(axis=1)
 
-        quality = max_jacc[0:num_labels+1].mean()
+        quality = max_jacc.mean()
 
         return quality
 
