@@ -181,7 +181,6 @@ class Optimizer():
                 self._quality.append(-quality)
                 self._settings.append(x)
 
-
         # starting point in parameter space
         x0 = self.get_numeric_parameters()
 
@@ -193,7 +192,8 @@ class Optimizer():
         res = minimize(fun, x0, method=method, callback=progress_callback, options=options)
 
         # print and show result
-        print(res)
+        if debug_output:
+            print(res)
         self.set_numeric_parameters(x0)
 
         self._running = False
@@ -281,7 +281,7 @@ class JaccardLabelImageOptimizer(Optimizer):
         n_pixels_pred = np.sum(overlap, axis=0, keepdims=True)
         n_pixels_true = np.sum(overlap, axis=1, keepdims=True)
 
-        # Caluclate intersection over union
+        # Calculate intersection over union
         iou = overlap / (n_pixels_pred + n_pixels_true - overlap)
         iou[np.isnan(iou)] = 0.0
 

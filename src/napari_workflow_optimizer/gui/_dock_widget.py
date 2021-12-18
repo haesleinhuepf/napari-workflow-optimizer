@@ -66,14 +66,19 @@ class WorkflowOptimizer(QWidget):
             self._push_button.setText("Cancelling...")
             self._optimizer.cancel()
             return
+        # Store original parameters in case we want to go back to them later.
         self._original_parameters = self._optimizer.get_numeric_parameters()
 
+        # Configure which parameters are constants (fix) and which should be optimized (free).
         for index, checkbox in enumerate(self._parameter_checkboxes):
             if not checkbox.isChecked():
                 self._optimizer.fix_parameter(index)
             else:
                 self._optimizer.free_parameter(index)
 
+        # Before we can optimize the workflow, we need to pass input images.
+        # Those are all layers that are not computed. Hence, we pass all layer-data
+        # to the workflow which doesn't exist yet.
         for layer in self.viewer.layers:
             workflow = self._manager.workflow
             try:
@@ -87,6 +92,7 @@ class WorkflowOptimizer(QWidget):
 
         self._maxiter = self.maxiter_select.value
 
+        # Optimization runs in a background thread
         @thread_worker
         def optimize_runner():
             yield self._optimizer.optimize(
@@ -95,6 +101,7 @@ class WorkflowOptimizer(QWidget):
                 maxiter=self._maxiter,
                 debug_output=True)
 
+        # Update progress/status in a separate thread
         from napari.utils import progress
         self._progress_reporter = progress(total=self.maxiter_select.value)
 
@@ -109,6 +116,7 @@ class WorkflowOptimizer(QWidget):
                 else:
                     return
 
+        # In case progress is updated, update the GUI from the main thread:
         self._iteration_count = 0
         def yield_progress(is_running):
             #print("Update status")
@@ -121,7 +129,7 @@ class WorkflowOptimizer(QWidget):
                     self._plot_quality()
             #print("Status updated")
 
-
+        # When the optimization is done, update the GUI from the main thread:
         def yield_result(best_result):
             self._optimizer.set_numeric_parameters(best_result)
             self._plot_quality()
@@ -131,6 +139,7 @@ class WorkflowOptimizer(QWidget):
             # update result
             self.update_viewer()
 
+        # Start optimization and progress/status updates
         optimize_worker = optimize_runner()
         optimize_worker.yielded.connect(yield_result)
         optimize_worker.start()
@@ -140,12 +149,12 @@ class WorkflowOptimizer(QWidget):
 
     def _plot_quality(self):
         # show result as plot
-        if self._result_plot is not None:
-            self.layout().removeWidget(self._result_plot)
-
         iteration, quality = self._optimizer.get_plot()
         from ._plotter import PlotterWidget
-        self._result_plot = PlotterWidget(iteration, quality, "Iteration", "Quality")
+        plotter_widget = PlotterWidget(iteration, quality, "Iteration", "Quality")
+        if self._result_plot is not None: # remove old plot if it existed already
+            self.layout().removeWidget(self._result_plot)
+        self._result_plot = plotter_widget
         self.layout().addWidget(self._result_plot)
 
     def update_viewer(self):
