@@ -7,7 +7,6 @@ class Optimizer():
         self._workflow = workflow
         self._numeric_parameter_indices = self._find_numeric_parameters()
         self._fixed_parameters = np.zeros((len(self._numeric_parameter_indices)))
-        print(len(self._numeric_parameter_indices), len(self._fixed_parameters))
         self._attempt = None
         self._quality = None
         self._running = False
@@ -83,6 +82,7 @@ class Optimizer():
                     quality = np.max(self._quality)
                 else:
                     quality = np.finfo(float).max
+                return quality
 
             # as we are minimizing, we multiply fitness with -1
             quality = -self._fitness(test, annotation)

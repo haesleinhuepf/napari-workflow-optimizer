@@ -15,10 +15,11 @@ Optimize image processing workflows in napari for segmentation quality
 
 The starting point for workflow optimization is a workflow and some reference ("ground truth") labels image. 
 Setup a workflow, e.g. using the [napari-pyclesperanto-assistant](https://www.napari-hub.org/plugins/napari-pyclesperanto-assistant).
-As an example, you can open `File > Open Samples > clEsperanto > blobs (from ImageJ)`, 
+As an example, you can open `File > Open Samples > scikit-image > Human mitosis`, 
 start the assistant from `Tools > Utilities > Assistant (clEsperanto)` and click the `Label` button. 
 You should then see a segmentation result that is cutting objects where it shouldn't. 
 The labels layer show an over-segmented result:
+
 ![img.png](docs/over_segmentation.png)
 
 You could now manually optimize the parameters of the `Voronoi-Otsu-Labeling` algorithm in the bottom right 
@@ -40,9 +41,10 @@ After clicking `Start optimization` and waiting a bit, show the `Result of voron
 
 How many iterations are necessary for the optimization depends on the workflow that's optimized and the number of parameters that the workflow has.
 In general, it is recommended to start with a low number of iterations. 
-For example, if you enter `5` iterations in the example shown above, you will see that the optimizer makes 11 attempts and
+For example, if you enter `7` iterations in the example shown above, you will see that the optimizer makes 11 attempts and
 the quality is increasing:
-![img.png](docs/iterations_5.png)
+
+![img.png](docs/iterations_7.png)
 
 When increasing the number of iterations to `10` (and after resetting the parameters to `2` and `2` to start from the same settings), 
 the attempt-quality plot suggests an optimal solution is found before the `10` iterations were reached:
@@ -62,6 +64,12 @@ Parameter optimization works well if
 
 If you change the workflow architecture after the optimizer window was opened, please re-open it
 to select the parameters that should be optimized. Changing parameters is ok and re-opening is not necessary.
+
+For visualization of a labeling result compared to a manual annotation, consider using the `Detect label edges` operation from the 
+assistant's `Binarize` category. It will draw outlines of labels and with the `Shuffle colors` button of the labels layer, you can
+visualize both edge images in different colors: 
+
+![img.png](docs/contour_overlay.png)
 
 ----------------------------------
 
