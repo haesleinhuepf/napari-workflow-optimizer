@@ -7,7 +7,7 @@ class Optimizer():
         self._workflow = workflow
         self._numeric_parameter_indices = self._find_numeric_parameters()
         self._fixed_parameters = np.zeros((len(self._numeric_parameter_indices)))
-        self._attempt = None
+        self._iteration = None
         self._quality = None
         self._running = False
         self._canceling = False
@@ -30,6 +30,17 @@ class Optimizer():
         return result
 
     def set_numeric_parameters(self, x):
+        """
+
+        Parameters
+        ----------
+        x: list of numbers
+            
+
+        Returns
+        -------
+
+        """
         counter = 0
         for parameter_index, [name, index] in enumerate(self._numeric_parameter_indices):
             if self._fixed_parameters[parameter_index] == 0:
@@ -39,12 +50,24 @@ class Optimizer():
                 counter += 1
 
     def get_all_numeric_parameters(self):
+        """
+        Returns
+        -------
+        All numeric parameters in the workflow, including the constants.
+        """
         result = []
         for name, index in self._numeric_parameter_indices:
             result.append(self._workflow.get_task(name)[index])
         return result
 
     def get_all_numeric_parameter_names(self):
+        """
+        Returns
+        -------
+        All names of numeric parameters in the workflow, including the constants.
+        A name is a tuple consisting of the layer name and the parameter name.
+        The layer name is typically related to the name of the function that generated the layer.
+        """
         result = []
         import inspect
         for name, index in self._numeric_parameter_indices:
@@ -57,23 +80,56 @@ class Optimizer():
         return result
 
     def total_number_of_parameters(self):
+        """
+
+        Returns
+        -------
+        Number of numeric parameters in the workflow.
+        """
         return len(self._numeric_parameter_indices)
 
     def fix_parameter(self, index):
+        """
+        The parameter with the given index becomes a constant in the optimization.
+        """
         self._fixed_parameters[index] = 1
 
     def free_parameter(self, index):
+        """
+        The parameter with the given index becomes a variable in the optimization.
+        """
         self._fixed_parameters[index] = 0
 
-    def optimize(self, target_task, annotation, method='nelder-mead', callback = None, maxiter = 100, debug_output = False):
+    def optimize(self, target_task, annotation, method='nelder-mead', maxiter = 100, debug_output = False):
         self._counter = 0
-        self._attempt = []
+        self._iteration = []
         self._quality = []
         self._settings = []
         self._running = True
         self._canceling = False
 
+        from functools import lru_cache
+
         def fun(x):
+            """
+            Helper function to make num_fun lru-cachable.
+            """
+            return num_fun(*(x.tolist()))
+
+        @lru_cache(maxsize=10)
+        def num_fun(*x):
+            """
+            Determine quality of a given parameter set.
+
+            Parameters
+            ----------
+            x : list of numbers
+                numeric parameters of the workflow to be tested
+
+            Returns
+            -------
+            quality, metric depends on implementation
+            """
             self._counter += 1
 
             if len(self._quality) > 0 and self._canceling:
@@ -96,11 +152,20 @@ class Optimizer():
             if debug_output:
                 print(self._counter, x, quality)
 
-            self._attempt.append(len(self._attempt) + 1)
-            self._quality.append(-quality)
-            self._settings.append(x)
-
             return quality
+
+        def progress_callback(x):
+            """
+            This callback is executed when the optimizer finished one iteration.
+            We then take the preliminary result and store it together with the
+            corresponding quality.
+            """
+            if not self._canceling:
+                quality = fun(x)
+                self._iteration.append(len(self._iteration) + 1)
+                self._quality.append(-quality)
+                self._settings.append(x)
+
 
         # starting point in parameter space
         x0 = self.get_numeric_parameters()
@@ -110,7 +175,7 @@ class Optimizer():
             'xatol': 1e-3,
             'disp': debug_output,
             'maxiter': maxiter}
-        res = minimize(fun, x0, method=method, callback=callback, options=options)
+        res = minimize(fun, x0, method=method, callback=progress_callback, options=options)
 
         # print and show result
         print(res)
@@ -122,7 +187,7 @@ class Optimizer():
         return res['x']
 
     def get_plot(self):
-        return self._attempt, self._quality
+        return self._iteration, self._quality
 
     def is_running(self):
         return self._running

@@ -82,13 +82,6 @@ class WorkflowOptimizer(QWidget):
                 print("Setting data", layer.name)
                 workflow.set(layer.name, layer.data)
 
-        self._iteration_count = 0
-        self._progress = False
-        def callback_progress(x):
-            self._iteration_count = self._iteration_count + 1
-            self._progress = True
-            print("Progress", x)
-
         from napari._qt.qthreading import thread_worker
         import time
 
@@ -99,7 +92,6 @@ class WorkflowOptimizer(QWidget):
             yield self._optimizer.optimize(
                 self.labels_select.value.name,
                 self.reference_select.value.data,
-                callback=callback_progress,
                 maxiter=self._maxiter,
                 debug_output=True)
 
@@ -109,7 +101,7 @@ class WorkflowOptimizer(QWidget):
         @thread_worker
         def status_runner():
             while True:
-                time.sleep(0.5)
+                time.sleep(0.2)
                 is_running = self._optimizer.is_running()
                 yield is_running
                 if is_running and not self._optimizer.is_cancelling():
@@ -117,13 +109,15 @@ class WorkflowOptimizer(QWidget):
                 else:
                     return
 
+        self._iteration_count = 0
         def yield_progress(is_running):
             #print("Update status")
             if is_running:
-                self._progress_reporter.set_description("Optimization attempt " + str(len(self._optimizer._attempt)))
-                if self._progress:
-                    self._progress_reporter.update(1)
-                    self._progress = False
+                self._progress_reporter.set_description("Optimization")
+                _, quality = self._optimizer.get_plot()
+                if self._iteration_count != len(quality):
+                    self._progress_reporter.update(len(quality) - self._iteration_count)
+                    self._iteration_count = len(quality)
                     self._plot_quality()
             else:
                 self._progress_reporter.close()
@@ -150,9 +144,9 @@ class WorkflowOptimizer(QWidget):
         if self._result_plot is not None:
             self.layout().removeWidget(self._result_plot)
 
-        attempts, quality = self._optimizer.get_plot()
+        iteration, quality = self._optimizer.get_plot()
         from ._plotter import PlotterWidget
-        self._result_plot = PlotterWidget(attempts, quality, "Attempt", "Quality")
+        self._result_plot = PlotterWidget(iteration, quality, "Iteration", "Quality")
         self.layout().addWidget(self._result_plot)
 
     def update_viewer(self):
