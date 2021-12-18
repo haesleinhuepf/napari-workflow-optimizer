@@ -46,10 +46,14 @@ class WorkflowOptimizer(QWidget):
         self._push_button = QPushButton("Start optimization")
         self._push_button.clicked.connect(self._on_run_click)
 
-        self.layout().addWidget(label_widget("Target", self.labels_select.native))
-        self.layout().addWidget(label_widget("Reference", self.reference_select.native))
-        self.layout().addWidget(label_widget("Number of iterations", self.maxiter_select.native))
-        self.layout().addWidget(self._push_button)
+        self._undo_button = QPushButton("Undo")
+        self._undo_button.clicked.connect(self._on_undo_click)
+        self._undo_button.setVisible(False)
+
+        self.layout().addWidget(vertical_widget(QLabel("Target"), self.labels_select.native))
+        self.layout().addWidget(vertical_widget(QLabel("Reference"), self.reference_select.native))
+        self.layout().addWidget(vertical_widget(QLabel("Number of iterations"), self.maxiter_select.native))
+        self.layout().addWidget(vertical_widget(self._push_button, self._undo_button))
         self.layout().setSpacing(10)
         self._result_plot = None
 
@@ -61,6 +65,13 @@ class WorkflowOptimizer(QWidget):
         self.labels_select.reset_choices(event)
         self.reference_select.reset_choices(event)
 
+    def _on_undo_click(self):
+        self._optimizer.set_numeric_parameters(self._original_parameters)
+        self._undo_button.setVisible(False)
+        if self._result_plot is not None: # remove old plot if it existed already
+            self.layout().removeWidget(self._result_plot)
+        self.update_viewer()
+
     def _on_run_click(self):
         if self._optimizer.is_running():
             self._push_button.setText("Cancelling...")
@@ -68,6 +79,7 @@ class WorkflowOptimizer(QWidget):
             return
         # Store original parameters in case we want to go back to them later.
         self._original_parameters = self._optimizer.get_numeric_parameters()
+        self._undo_button.setVisible(False)
 
         # Configure which parameters are constants (fix) and which should be optimized (free).
         for index, checkbox in enumerate(self._parameter_checkboxes):
@@ -136,6 +148,8 @@ class WorkflowOptimizer(QWidget):
             self._push_button.setText("Start optimization again")
             self._progress_reporter.close()
 
+            self._undo_button.setVisible(True)
+
             # update result
             self.update_viewer()
 
@@ -187,10 +201,10 @@ class WorkflowOptimizer(QWidget):
             else:
                 warnings.warn("Can't find widget for " + layer_name + " " + parameter_name)
 
-def label_widget(label, right):
+def vertical_widget(left, right):
     widget = QWidget()
     widget.setLayout(QHBoxLayout())
-    widget.layout().addWidget(QLabel(label))
+    widget.layout().addWidget(left)
     widget.layout().addWidget(right)
     widget.layout().setSpacing(1)
     widget.layout().setContentsMargins(0,0,0,0)
