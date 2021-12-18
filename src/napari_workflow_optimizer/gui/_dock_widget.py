@@ -43,13 +43,13 @@ class WorkflowOptimizer(QWidget):
             self._parameter_checkboxes.append(checkbox)
             self.layout().addWidget(checkbox)
 
-        btn = QPushButton("Start optimization")
-        btn.clicked.connect(self._on_run_click)
+        self._push_button = QPushButton("Start optimization")
+        self._push_button.clicked.connect(self._on_run_click)
 
         self.layout().addWidget(label_widget("Target", self.labels_select.native))
         self.layout().addWidget(label_widget("Reference", self.reference_select.native))
         self.layout().addWidget(label_widget("Number of iterations", self.maxiter_select.native))
-        self.layout().addWidget(btn)
+        self.layout().addWidget(self._push_button)
         self.layout().setSpacing(10)
         self._result_plot = None
 
@@ -62,6 +62,10 @@ class WorkflowOptimizer(QWidget):
         self.reference_select.reset_choices(event)
 
     def _on_run_click(self):
+        if self._optimizer.is_running():
+            self._push_button.setText("Cancelling...")
+            self._optimizer.cancel()
+            return
         self._original_parameters = self._optimizer.get_numeric_parameters()
 
         for index, checkbox in enumerate(self._parameter_checkboxes):
@@ -78,21 +82,25 @@ class WorkflowOptimizer(QWidget):
                 print("Setting data", layer.name)
                 workflow.set(layer.name, layer.data)
 
-        self._progress = 0
-        def progress_report(x):
-            self._progress += 1
+        self._iteration_count = 0
+        self._progress = False
+        def callback_progress(x):
+            self._iteration_count = self._iteration_count + 1
+            self._progress = True
             print("Progress", x)
 
         from napari._qt.qthreading import thread_worker
         import time
+
+        self._maxiter = self.maxiter_select.value
 
         @thread_worker
         def optimize_runner():
             yield self._optimizer.optimize(
                 self.labels_select.value.name,
                 self.reference_select.value.data,
-                callback=progress_report,
-                maxiter=self.maxiter_select.value,
+                callback=callback_progress,
+                maxiter=self._maxiter,
                 debug_output=True)
 
         from napari.utils import progress
@@ -102,34 +110,50 @@ class WorkflowOptimizer(QWidget):
         def status_runner():
             while True:
                 time.sleep(0.5)
-                if self._optimizer.is_running():
-                    self._progress_reporter.set_description("Optimizing")
-                    self._progress_reporter.update(self._progress)
+                is_running = self._optimizer.is_running()
+                yield is_running
+                if is_running and not self._optimizer.is_cancelling():
+                    self._push_button.setText("Cancel (" + str(self._iteration_count) + "/" + str(self._maxiter) + ")")
                 else:
-                    self._progress_reporter.close()
-                    break
+                    return
+
+        def yield_progress(is_running):
+            #print("Update status")
+            if is_running:
+                self._progress_reporter.set_description("Optimization attempt " + str(len(self._optimizer._attempt)))
+                if self._progress:
+                    self._progress_reporter.update(1)
+                    self._progress = False
+                    self._plot_quality()
+            else:
+                self._progress_reporter.close()
+            #print("Status updated")
+
 
         def yield_result(best_result):
             self._optimizer.set_numeric_parameters(best_result)
-
-            # show result as plot
-            if self._result_plot is not None:
-                self.layout().removeWidget(self._result_plot)
-
-            attempts, quality = self._optimizer.get_plot()
-            from ._plotter import PlotterWidget
-            self._result_plot = PlotterWidget(attempts, quality, "Attempt", "Quality")
-            self.layout().addWidget(self._result_plot)
+            self._plot_quality()
+            self._push_button.setText("Start optimization again")
 
             # update result
             self.update_viewer()
 
         optimize_worker = optimize_runner()
-        status_worker = status_runner()
         optimize_worker.yielded.connect(yield_result)
         optimize_worker.start()
+        status_worker = status_runner()
+        status_worker.yielded.connect(yield_progress)
         status_worker.start()
 
+    def _plot_quality(self):
+        # show result as plot
+        if self._result_plot is not None:
+            self.layout().removeWidget(self._result_plot)
+
+        attempts, quality = self._optimizer.get_plot()
+        from ._plotter import PlotterWidget
+        self._result_plot = PlotterWidget(attempts, quality, "Attempt", "Quality")
+        self.layout().addWidget(self._result_plot)
 
     def update_viewer(self):
         WIDGET_KEY = "magic_gui_widget"

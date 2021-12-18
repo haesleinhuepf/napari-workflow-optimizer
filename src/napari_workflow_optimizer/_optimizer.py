@@ -10,6 +10,7 @@ class Optimizer():
         self._attempt = None
         self._quality = None
         self._running = False
+        self._canceling = False
 
     def _find_numeric_parameters(self):
         numeric_type_indices = []
@@ -70,9 +71,14 @@ class Optimizer():
         self._quality = []
         self._settings = []
         self._running = True
+        self._canceling = False
 
         def fun(x):
             self._counter += 1
+
+            if len(self._quality) > 0 and self._canceling:
+                return np.max(self._quality)
+
             # apply current parameter setting
             self.set_numeric_parameters(x)
             try:
@@ -111,6 +117,7 @@ class Optimizer():
         self.set_numeric_parameters(x0)
 
         self._running = False
+        self._canceling = False
 
         return res['x']
 
@@ -119,6 +126,12 @@ class Optimizer():
 
     def is_running(self):
         return self._running
+
+    def cancel(self):
+        self._canceling = True
+
+    def is_cancelling(self):
+        return self._canceling
 
 class SparseAnnotatedBinaryImageOptimizer(Optimizer):
     def __init__(self, workflow: Workflow):
