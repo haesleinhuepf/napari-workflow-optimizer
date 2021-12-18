@@ -78,25 +78,58 @@ class WorkflowOptimizer(QWidget):
                 print("Setting data", layer.name)
                 workflow.set(layer.name, layer.data)
 
-        best_result = self._optimizer.optimize(
-            self.labels_select.value.name,
-            self.reference_select.value.data,
-            maxiter=self.maxiter_select.value,
-            debug_output=True)
+        self._progress = 0
+        def progress_report(x):
+            self._progress += 1
+            print("Progress", x)
 
-        self._optimizer.set_numeric_parameters(best_result)
+        from napari._qt.qthreading import thread_worker
+        import time
 
-        # show result as plot
-        if self._result_plot is not None:
-            self.layout().removeWidget(self._result_plot)
+        @thread_worker
+        def optimize_runner():
+            yield self._optimizer.optimize(
+                self.labels_select.value.name,
+                self.reference_select.value.data,
+                callback=progress_report,
+                maxiter=self.maxiter_select.value,
+                debug_output=True)
 
-        attempts, quality = self._optimizer.get_plot()
-        from ._plotter import PlotterWidget
-        self._result_plot = PlotterWidget(attempts, quality, "Attempt", "Quality")
-        self.layout().addWidget(self._result_plot)
+        from napari.utils import progress
+        self._progress_reporter = progress(total=self.maxiter_select.value)
 
-        # update result
-        self.update_viewer()
+        @thread_worker
+        def status_runner():
+            while True:
+                time.sleep(0.5)
+                if self._optimizer.is_running():
+                    self._progress_reporter.set_description("Optimizing")
+                    self._progress_reporter.update(self._progress)
+                else:
+                    self._progress_reporter.close()
+                    break
+
+        def yield_result(best_result):
+            self._optimizer.set_numeric_parameters(best_result)
+
+            # show result as plot
+            if self._result_plot is not None:
+                self.layout().removeWidget(self._result_plot)
+
+            attempts, quality = self._optimizer.get_plot()
+            from ._plotter import PlotterWidget
+            self._result_plot = PlotterWidget(attempts, quality, "Attempt", "Quality")
+            self.layout().addWidget(self._result_plot)
+
+            # update result
+            self.update_viewer()
+
+        optimize_worker = optimize_runner()
+        status_worker = status_runner()
+        optimize_worker.yielded.connect(yield_result)
+        optimize_worker.start()
+        status_worker.start()
+
 
     def update_viewer(self):
         WIDGET_KEY = "magic_gui_widget"

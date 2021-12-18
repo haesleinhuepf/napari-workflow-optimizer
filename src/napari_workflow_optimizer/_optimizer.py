@@ -64,7 +64,7 @@ class Optimizer():
     def free_parameter(self, index):
         self._fixed_parameters[index] = 0
 
-    def optimize(self, target_task, annotation, method='nelder-mead', maxiter=100, debug_output=False):
+    def optimize(self, target_task, annotation, method='nelder-mead', callback = None, maxiter = 100, debug_output = False):
         self._counter = 0
         self._attempt = []
         self._quality = []
@@ -104,7 +104,7 @@ class Optimizer():
             'xatol': 1e-3,
             'disp': debug_output,
             'maxiter': maxiter}
-        res = minimize(fun, x0, method=method, options=options)
+        res = minimize(fun, x0, method=method, callback=callback, options=options)
 
         # print and show result
         print(res)
