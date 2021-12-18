@@ -119,8 +119,6 @@ class WorkflowOptimizer(QWidget):
                     self._progress_reporter.update(len(quality) - self._iteration_count)
                     self._iteration_count = len(quality)
                     self._plot_quality()
-            else:
-                self._progress_reporter.close()
             #print("Status updated")
 
 
@@ -128,6 +126,7 @@ class WorkflowOptimizer(QWidget):
             self._optimizer.set_numeric_parameters(best_result)
             self._plot_quality()
             self._push_button.setText("Start optimization again")
+            self._progress_reporter.close()
 
             # update result
             self.update_viewer()

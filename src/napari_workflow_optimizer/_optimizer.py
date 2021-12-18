@@ -115,7 +115,7 @@ class Optimizer():
         -------
         List of numbers corresponding to the not-constant numeric parameters of a given workflow.
         """
-        method = 'nelder-mead',
+        method = 'nelder-mead'
         self._counter = 0
         self._iteration = []
         self._quality = []
@@ -275,6 +275,8 @@ class JaccardLabelImageOptimizer(Optimizer):
         import numpy as np
         overlap = confusion_matrix(reference.ravel(), test.ravel())
 
+        num_labels = reference.max()
+
         # Measure correctly labeled pixels
         n_pixels_pred = np.sum(overlap, axis=0, keepdims=True)
         n_pixels_true = np.sum(overlap, axis=1, keepdims=True)
@@ -285,7 +287,7 @@ class JaccardLabelImageOptimizer(Optimizer):
 
         max_jacc = iou.max(axis=1)
 
-        quality = max_jacc.mean()
+        quality = max_jacc[0:num_labels+1].mean()
 
         return quality
 
