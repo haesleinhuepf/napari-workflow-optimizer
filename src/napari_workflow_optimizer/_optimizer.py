@@ -76,7 +76,13 @@ class Optimizer():
             self._counter += 1
             # apply current parameter setting
             self.set_numeric_parameters(x)
-            test = self._workflow.get(target_task)
+            try:
+                test = self._workflow.get(target_task)
+            except:
+                if len(self._quality) > 0:
+                    quality = np.max(self._quality)
+                else:
+                    quality = np.finfo(float).max
 
             # as we are minimizing, we multiply fitness with -1
             quality = -self._fitness(test, annotation)
