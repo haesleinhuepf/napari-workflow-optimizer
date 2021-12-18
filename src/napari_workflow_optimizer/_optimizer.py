@@ -13,6 +13,10 @@ class Optimizer():
         self._canceling = False
 
     def _find_numeric_parameters(self):
+        """
+        Analyse the workflow, determine the numeric parameters and store the names of the given layers
+        and corresponing parameter indices.
+        """
         numeric_type_indices = []
         for name in self._workflow._tasks.keys():
             task = self._workflow.get_task(name)
@@ -23,6 +27,9 @@ class Optimizer():
         return numeric_type_indices
 
     def get_numeric_parameters(self):
+        """
+        Returns all non-constant numeric parameters of the workflow.
+        """
         result = []
         for parameter_index, [name, index] in enumerate(self._numeric_parameter_indices):
             if self._fixed_parameters[parameter_index] == 0:
@@ -31,15 +38,7 @@ class Optimizer():
 
     def set_numeric_parameters(self, x):
         """
-
-        Parameters
-        ----------
-        x: list of numbers
-            
-
-        Returns
-        -------
-
+        Overwrites all non-constant numeric parameters of the workflow with a given list of numbers x.
         """
         counter = 0
         for parameter_index, [name, index] in enumerate(self._numeric_parameter_indices):
@@ -81,10 +80,7 @@ class Optimizer():
 
     def total_number_of_parameters(self):
         """
-
-        Returns
-        -------
-        Number of numeric parameters in the workflow.
+        Returns the number of numeric parameters in the workflow.
         """
         return len(self._numeric_parameter_indices)
 
@@ -100,7 +96,26 @@ class Optimizer():
         """
         self._fixed_parameters[index] = 0
 
-    def optimize(self, target_task, annotation, method='nelder-mead', maxiter = 100, debug_output = False):
+    def optimize(self, target_task, annotation, maxiter = 100, debug_output = False):
+        """
+        Optimizes the given workflow.
+
+        Parameters
+        ----------
+        target_task: str
+            The layer/task name which should be optimized
+        annotation: ndarry
+            Reference image
+        maxiter: int
+            Number of iterations
+        debug_output: bool
+            If set to true, every attempt will be prompted to stdout
+
+        Returns
+        -------
+        List of numbers corresponding to the not-constant numeric parameters of a given workflow.
+        """
+        method = 'nelder-mead',
         self._counter = 0
         self._iteration = []
         self._quality = []
@@ -187,15 +202,27 @@ class Optimizer():
         return res['x']
 
     def get_plot(self):
+        """
+        Returns list of executed iterations numbers (a range) and corresponding measured quality values.
+        """
         return self._iteration, self._quality
 
     def is_running(self):
+        """
+        Returns if the optimizer is currently running
+        """
         return self._running
 
     def cancel(self):
+        """
+        In case the optimizer is running, we can interrupt it by calling this function.
+        """
         self._canceling = True
 
     def is_cancelling(self):
+        """
+        Returns if the optimizier is currently cancelling.
+        """
         return self._canceling
 
 class SparseAnnotatedBinaryImageOptimizer(Optimizer):
