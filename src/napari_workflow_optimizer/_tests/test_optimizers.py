@@ -70,7 +70,7 @@ def test_membrane_segmentation():
     result = w.get("labeled")
 
     print(result.max())
-    assert abs(result.max() - 83) < 2  # accept an error of 2 in object count
+    assert abs(result.max() - 125) < 2  # accept an error of 2 in object count
 
 
 def test_sparse_label_image_optimizer():
@@ -87,4 +87,4 @@ def test_sparse_label_image_optimizer():
 
     result = w.get("labeled")
 
-    assert abs(result.max() - 70) < 2  # accept an error of 2 in object count
+    assert abs(result.max() - 90) < 2  # accept an error of 2 in object count
