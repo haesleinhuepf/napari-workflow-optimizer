@@ -283,6 +283,8 @@ class JaccardLabelImageOptimizer(Optimizer):
         from sklearn.metrics import confusion_matrix
         import numpy as np
 
+        reference = np.asarray(reference)
+
         # determine overlap
         overlap = confusion_matrix(reference.ravel(), test.ravel())
 
