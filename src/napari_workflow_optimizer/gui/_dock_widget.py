@@ -69,9 +69,10 @@ class WorkflowOptimizer(QWidget):
     def _plot_button(self, operation_name, parameter_name, index):
         def click():
             self._set_input_images()
-            self.viewer.window.add_dock_widget(PlotParameterWidget(self._optimizer, operation_name, parameter_name, self.labels_select.value.name, self.reference_select.value, index))
+            self.viewer.window.add_dock_widget(PlotParameterWidget(self._optimizer, operation_name, parameter_name, self.labels_select.value.name, self.reference_select.value, index),
+                                               name="Plot quality over " + parameter_name)
         button = QPushButton("Plot")
-        button.setMaximumWidth(100)
+        button.setMaximumWidth(50)
         button.clicked.connect(click)
         return button
 
