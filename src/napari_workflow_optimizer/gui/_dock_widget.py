@@ -37,7 +37,7 @@ class WorkflowOptimizer(QWidget):
         self.layout().addWidget(QLabel("Select parameters to optimize"))
         self._parameter_checkboxes = []
         for layer_name, parameter_name in self._optimizer.get_all_numeric_parameter_names():
-            name = layer_name.replace("Result of", "").replace("result", "").strip() + "." + parameter_name
+            name = short_text(layer_name) + " " + parameter_name
             checkbox = QCheckBox(name)
             checkbox.setChecked(True)
             self._parameter_checkboxes.append(checkbox)
@@ -210,6 +210,13 @@ def vertical_widget(left, right):
     widget.layout().setContentsMargins(0,0,0,0)
 
     return widget
+
+
+def short_text(text):
+    text = text.replace("Result of", "").replace("result", "").strip()
+    if len(text) > 20:
+        text = text[0:20] + "..."
+    return text
 
 
 @magic_factory
