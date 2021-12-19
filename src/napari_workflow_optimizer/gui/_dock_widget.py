@@ -258,10 +258,10 @@ class PlotParameterWidget(QWidget):
             for i in range(0, num_steps):
                 parameters[index] = i * step + start
                 optimizer.set_numeric_parameters(parameters)
-                #try:
-                test = optimizer._workflow.get(target)
-                #except:
-                #    continue
+                try:
+                    test = optimizer._workflow.get(target)
+                except:
+                    continue
 
                 quality = optimizer._fitness(test, reference_layer.data)
                 x_values.append(parameters[index])
