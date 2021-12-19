@@ -48,6 +48,15 @@ class Optimizer():
                 self._workflow.set_task(name, tuple(task))
                 counter += 1
 
+    def set_all_numeric_parameters(self, x):
+        """
+        Overwrites all numeric parameters of the workflow with a given list of numbers x.
+        """
+        for parameter_index, [name, index] in enumerate(self._numeric_parameter_indices):
+            task = list(self._workflow.get_task(name))
+            task[index] = x[parameter_index]
+            self._workflow.set_task(name, tuple(task))
+
     def get_all_numeric_parameters(self):
         """
         Returns
