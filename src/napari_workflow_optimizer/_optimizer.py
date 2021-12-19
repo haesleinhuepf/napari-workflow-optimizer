@@ -290,10 +290,6 @@ class JaccardLabelImageOptimizer(Optimizer):
         num_labels_reference = reference.max()
         overlap = overlap[0:num_labels_reference + 1, :]
 
-        # ignore overlap with background
-        overlap[0, :] = 0
-        overlap[:, 0] = 0
-
         # Measure correctly labeled pixels
         n_pixels_pred = np.sum(overlap, axis=0, keepdims=True)
         n_pixels_true = np.sum(overlap, axis=1, keepdims=True)
@@ -304,8 +300,6 @@ class JaccardLabelImageOptimizer(Optimizer):
         divisor[is_zero] = 1
         overlap[is_zero] = 0
         iou = overlap / divisor
-
-        # print(iou[0:10,0:10])
 
         max_jacc = iou.max(axis=1)
 
