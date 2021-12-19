@@ -279,18 +279,33 @@ class JaccardLabelImageOptimizer(Optimizer):
         super().__init__(workflow)
 
     def _fitness(self, test, reference):
-        # from https://github.com/BiAPoL/biapol-utilities/blob/main/biapol_utilities/label/_intersection_over_union.py
+        # adapted from https://github.com/BiAPoL/biapol-utilities/blob/main/biapol_utilities/label/_intersection_over_union.py
         from sklearn.metrics import confusion_matrix
         import numpy as np
+
+        # determine overlap
         overlap = confusion_matrix(reference.ravel(), test.ravel())
+
+        # crop out region in confusion matrix where reference labels are
+        num_labels_reference = reference.max()
+        overlap = overlap[0:num_labels_reference + 1, :]
+
+        # ignore overlap with background
+        overlap[0, :] = 0
+        overlap[:, 0] = 0
 
         # Measure correctly labeled pixels
         n_pixels_pred = np.sum(overlap, axis=0, keepdims=True)
         n_pixels_true = np.sum(overlap, axis=1, keepdims=True)
 
         # Calculate intersection over union
-        iou = overlap / (n_pixels_pred + n_pixels_true - overlap)
-        iou[np.isnan(iou)] = 0.0
+        divisor = (n_pixels_pred + n_pixels_true - overlap)
+        is_zero = divisor == 0
+        divisor[is_zero] = 1
+        overlap[is_zero] = 0
+        iou = overlap / divisor
+
+        # print(iou[0:10,0:10])
 
         max_jacc = iou.max(axis=1)
 
