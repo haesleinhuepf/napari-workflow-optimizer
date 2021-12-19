@@ -219,12 +219,7 @@ def short_text(text):
     return text
 
 
-@magic_factory
-def example_magic_widget(img_layer: "napari.layers.Image"):
-    print(f"you have selected {img_layer}")
-
-
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
     # you can return either a single widget, or a sequence of widgets
-    return [WorkflowOptimizer, example_magic_widget]
+    return [WorkflowOptimizer]
