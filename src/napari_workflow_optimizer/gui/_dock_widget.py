@@ -6,6 +6,7 @@ see: https://napari.org/docs/dev/plugins/hook_specifications.html
 
 Replace code below according to your needs.
 """
+import numpy as np
 from napari_plugin_engine import napari_hook_implementation
 from qtpy.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox, QLabel, QDoubleSpinBox
 from magicgui import magic_factory
@@ -69,8 +70,9 @@ class WorkflowOptimizer(QWidget):
     def _plot_button(self, operation_name, parameter_name, index):
         def click():
             self._set_input_images()
-            self.viewer.window.add_dock_widget(PlotParameterWidget(self._optimizer, operation_name, parameter_name, self.labels_select.value.name, self.reference_select.value, index),
+            dw = self.viewer.window.add_dock_widget(PlotParameterWidget(self._optimizer, operation_name, parameter_name, self.labels_select.value.name, self.reference_select.value, index),
                                                name="Plot quality over " + parameter_name)
+            dw.setFloating(True)
         button = QPushButton("Plot")
         button.setMaximumWidth(50)
         button.clicked.connect(click)
@@ -232,10 +234,16 @@ class PlotParameterWidget(QWidget):
         value = optimizer.get_all_numeric_parameters()[index]
 
         start_value_spinner = QDoubleSpinBox()
+        start_value_spinner.setMinimum(np.finfo(float).min)
+        start_value_spinner.setMaximum(np.finfo(float).max)
         start_value_spinner.setValue(value * 0.75)
 
         end_value_spinner = QDoubleSpinBox()
+        end_value_spinner.setMinimum(np.finfo(float).min)
+        end_value_spinner.setMaximum(np.finfo(float).max)
         end_value_spinner.setValue(value * 1.5)
+        if start_value_spinner.value() == end_value_spinner.value():
+            end_value_spinner.setValue(start_value_spinner.value() + 1)
 
         second_row.layout().addWidget(QLabel("Range"))
         second_row.layout().addWidget(start_value_spinner)
@@ -281,6 +289,8 @@ class PlotParameterWidget(QWidget):
         button.clicked.connect(plot)
         second_row.layout().addWidget(button)
         self.layout().addWidget(second_row)
+
+        self.setMinimumHeight(350)
 
 
 def vertical_widget(left, right):
