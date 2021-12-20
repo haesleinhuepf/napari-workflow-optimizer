@@ -190,7 +190,7 @@ class WorkflowOptimizer(QWidget):
             try:
                 workflow.get_task(layer.name)
             except KeyError:
-                print("Setting data", layer.name)
+                #print("Setting data", layer.name)
                 workflow.set(layer.name, layer.data)
 
     def _plot_quality(self):
@@ -223,7 +223,7 @@ class WorkflowOptimizer(QWidget):
             layer = self.viewer.layers[layer_name]
 
             if WIDGET_KEY in layer.metadata:
-                print("Updating", layer_name, parameter_name, value)
+                #print("Updating", layer_name, parameter_name, value)
                 widget = layer.metadata[WIDGET_KEY]
                 parameter_widget = find_widget(widget, parameter_name)
                 if parameter_widget is not None:
@@ -232,6 +232,8 @@ class WorkflowOptimizer(QWidget):
                     warnings.warn("Can't update widget for " + layer_name + " " + parameter_name)
             else:
                 warnings.warn("Can't find widget for " + layer_name + " " + parameter_name)
+
+            self._manager.invalidate([layer_name])
 
 
 class PlotParameterWidget(QWidget):
