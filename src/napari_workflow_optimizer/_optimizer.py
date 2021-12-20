@@ -216,6 +216,13 @@ class Optimizer():
         """
         return self._iteration, self._quality
 
+    def get_best_result(self):
+        """
+        Goes through intermediate results and returns the parameter settings with the best quality so far.
+        """
+        max_quality_index = np.argmax(self._quality)
+        return self._settings[max_quality_index]
+
     def is_running(self):
         """
         Returns if the optimizer is currently running

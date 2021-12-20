@@ -53,11 +53,22 @@ class WorkflowOptimizer(QWidget):
         self._undo_button = QPushButton("Undo")
         self._undo_button.clicked.connect(self._on_undo_click)
         self._undo_button.setVisible(False)
+        self._undo_button.setToolTip("Load parameter settings from before last optimization.\nIf you run optimization again, original settings are overwritten.")
 
+        self._live_update_checkbox = QCheckBox("Live-update")
+        self._live_update_checkbox.setToolTip("This updates the segmentation result in the viewer while optimization.\nActivating live-update makes the optimization \nvery slow but potentially nice to look at.")
+        self.layout().addWidget(self._live_update_checkbox)
         self.layout().addWidget(vertical_widget(QLabel("Number of iterations"), self.maxiter_select.native))
         self.layout().addWidget(vertical_widget(self._push_button, self._undo_button))
         self.layout().setSpacing(10)
         self._result_plot = None
+
+    def _enable_gui(self, enabled:bool):
+        self._undo_button.setEnabled(enabled)
+        self.labels_select.native.setEnabled(enabled)
+        self.reference_select.native.setEnabled(enabled)
+        for cb in self._parameter_checkboxes:
+            cb.setEnabled(enabled)
 
     def showEvent(self, event) -> None:
         super().showEvent(event)
@@ -93,6 +104,7 @@ class WorkflowOptimizer(QWidget):
         # Store original parameters in case we want to go back to them later.
         self._original_parameters = self._optimizer.get_numeric_parameters()
         self._undo_button.setVisible(False)
+        self._enable_gui(False)
 
         # Configure which parameters are constants (fix) and which should be optimized (free).
         for index, checkbox in enumerate(self._parameter_checkboxes):
@@ -143,6 +155,9 @@ class WorkflowOptimizer(QWidget):
                     self._progress_reporter.update(len(quality) - self._iteration_count)
                     self._iteration_count = len(quality)
                     self._plot_quality()
+                    if self._live_update_checkbox.isChecked():
+                        self._optimizer.set_numeric_parameters(self._optimizer.get_best_result())
+                        self.update_viewer()
             #print("Status updated")
 
         # When the optimization is done, update the GUI from the main thread:
@@ -153,6 +168,7 @@ class WorkflowOptimizer(QWidget):
             self._progress_reporter.close()
 
             self._undo_button.setVisible(True)
+            self._enable_gui(True)
 
             # update result
             self.update_viewer()
@@ -252,6 +268,11 @@ class PlotParameterWidget(QWidget):
         self._result_plot = None
 
         def plot():
+            if optimizer.is_running():
+                warnings.warn("Cannot run plotter while optimizer is running.")
+                return
+
+
             backup = optimizer.get_all_numeric_parameters()
             parameters = list(backup).copy()
 
