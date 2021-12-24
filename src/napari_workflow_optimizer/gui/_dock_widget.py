@@ -222,9 +222,9 @@ class WorkflowOptimizer(QWidget):
                 self._optimizer.get_all_numeric_parameters()):
             layer = self.viewer.layers[layer_name]
 
-            if WIDGET_KEY in layer.metadata:
+            if layer.source.widget is not None:
                 #print("Updating", layer_name, parameter_name, value)
-                widget = layer.metadata[WIDGET_KEY]
+                widget = layer.source.widget
                 parameter_widget = find_widget(widget, parameter_name)
                 if parameter_widget is not None:
                     parameter_widget.native.setValue(value)
