@@ -9,7 +9,7 @@
 
 Optimize image processing workflows in napari for segmentation quality
 
-![img.png](docs/napari-workflow-optimizer.gif.png)
+![img.png](docs/napari-workflow-optimizer.gif)
 [Download full 2:00 movie](docs/napari-workflow-optimizer.mp4)
 
 ## Usage
