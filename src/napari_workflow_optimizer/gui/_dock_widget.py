@@ -18,7 +18,7 @@ from magicgui.widgets import create_widget
 from napari_tools_menu import register_dock_widget
 import warnings
 
-@register_dock_widget(menu="Utilities > Workflow optimizer (Labels)")
+@register_dock_widget(menu="Utilities > Workflow Optimizer (Labels)")
 class WorkflowOptimizer(QWidget):
     def __init__(self, napari_viewer, optimizer_class=JaccardLabelImageOptimizer):
         super().__init__()
