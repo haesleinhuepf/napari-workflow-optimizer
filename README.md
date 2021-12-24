@@ -10,7 +10,7 @@
 Optimize image processing workflows in napari for segmentation quality
 
 ![img.png](docs/napari-workflow-optimizer.gif)
-[Download full 2:00 movie](docs/napari-workflow-optimizer.mp4)
+[Download full movie (2:00 min)](docs/napari-workflow-optimizer.mp4)
 
 ## Usage
 
@@ -79,14 +79,14 @@ After another moment, optimization will finish again, potentially leading to an 
 
 ![](docs/screenshot9_finished_optimization_again.png)
 
-### Step 3: Visualization of result
+### Step 3: Visualization of results
 
 Make sure the segmentation has high quality by inspecting the result visually. Use the `contour` setting of the labels layer
 and hide/show the outlines of the labeled layer:
 
 ![](docs/screenshot10_contours_on.png)
 
-![](docs/screenshot11_contours_off.png)
+![](docs/screenshot11_contours_off.jpg)
 
 ### Optimization Hints
 
@@ -122,18 +122,17 @@ This [napari] plugin was generated with [Cookiecutter] using [@napari]'s [cookie
 
 ## Installation
 
-## Installation
-
 Furthermore, to reproduce the procedure above, please download and install 
 [napari](https://napari.org/),
 [pyopencl](https://documen.tician.de/pyopencl/),
 the [napari-pyclesperanto-assistant](https://www.napari-hub.org/plugins/napari-pyclesperanto-assistant) and
 the [napari-segment-blobs-and-things-with-membranes](https://www.napari-hub.org/plugins/napari-segment-blobs-and-things-with-membranes) plugin. E.g. using 
-[conda](https://docs.conda.io/en/latest/) and [pip](https://pypi.org/project/pip/):\
+[conda](https://docs.conda.io/en/latest/) and [pip](https://pypi.org/project/pip/):
 
 ```
 conda create --name napari-opti python=3.8
 conda activate napari-opti
+
 conda install pyopencl napari
 pip install napari-pyclesperanto-assistant napari-segment-blobs-and-things-with-membranes
 pip install napari-workflow-optimizer
