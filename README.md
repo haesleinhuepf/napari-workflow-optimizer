@@ -101,8 +101,9 @@ Repeat these steps a couple of times to get a feeling for your parameter space.
 
 Furthermore, parameter optimization works well if
 * the initial settings are close to a good segmentation,
-* a small number of parameters (a short workflow) are optimized and
-* the reference annotation is prepared carefully.
+* a small number of parameters (a short workflow) are optimized,
+* the reference annotation is prepared carefully and
+* the dataset is small. Consider using a small representative crop in case of bigger datasets.
 
 ### Workflow optimization scripting
 
