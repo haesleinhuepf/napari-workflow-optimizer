@@ -9,7 +9,7 @@
 
 Optimize image processing workflows in napari for segmentation quality
 
-![img.png](docs/napari-workflow-optimizer.gif)
+![img.png](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/napari-workflow-optimizer.gif)
 
 ## Usage
 
@@ -20,25 +20,25 @@ These datasets should be ready. You can reproduce the following procedure by dow
 [scikit-image cells3d example data set](https://scikit-image.org/docs/dev/api/skimage.data.html#skimage.data.cells3d)) and a corresponding 
 [sparse annotation label image](https://github.com/haesleinhuepf/napari-workflow-optimizer/blob/main/demo/membranes_2d_sparse_labels.tif).
 For reproducing the following procedure, also follow the [installation instructions](https://github.com/haesleinhuepf/napari-workflow-optimizer#optimization-hints) below.
-The whole procedure is [also shown in this video](docs/napari-workflow-optimizer.mp4), an extended version of the trailer above.
+The whole procedure is [also shown in this video](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/napari-workflow-optimizer.mp4), an extended version of the trailer above.
 
 ### Step 0: Loading data and setting up the workflow
 
 Load the "membranes_2d.tif" data set, e.g. by drag&drop on napari and start the Assistant from the `Tools > Utilities > Assistant (clEsperanto)` menu.
 
-![](docs/screenshot1_start_raw.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot1_start_raw.png)
 
 Click the `Label` button and select as operation "Seeded watershed using local minima as seeds and an intensity threshold (nsbatwm)".
 
-![](docs/screenshot2_labeled_beginning.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot2_labeled_beginning.png)
 
 Draw an annotation in a new labels layer or load the example spare annotation "membranes_2d_sparse_labels.tif". 
 
-![](docs/screenshot4_loaded_manual_annotation.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot4_loaded_manual_annotation.png)
 
 In case the image is not displayed as label image, convert it to a label image by right-clicking on the entry in the layers list:
 
-![](docs/screenshot3_load_manual_annotation.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot3_load_manual_annotation.png)
 
 ### Step 1: The Workflow Optimizer
 
@@ -48,7 +48,7 @@ Select the manual annotation as reference layer for the optimization.
 Consider increasing the number of iterations. This number depends on your segmenation problem. 
 In the present example, 100 iterations should be enough.
 
-![](docs/screenshot5_start_optimization.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot5_start_optimization.png)
 
 The optimizer will plot quality over the number of iterations to show the progress of optimization. 
 To determine the quality, the optimizer will measure the maximum overlap ([Jaccard index](https://en.wikipedia.org/wiki/Jaccard_index)) 
@@ -56,7 +56,7 @@ of any labeled object over the manually annotated objects and calculate the mean
 After a moment, optimization will finish and update the labeled image. 
 If your starting point for the optimization was already good, the result may now look better than before.
 
-![](docs/screenshot6_finished_optimization.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot6_finished_optimization.png)
 
 ### Step 2: Manual parameter space plotting
 
@@ -68,25 +68,25 @@ Thus, to demonstrate the procedure we plot the parameter space beween 0 and 10.
 The quality plotted over this parameter obviously has a local maxium at 2.34, which was detected by the optimizer.
 However, it also has another local maxium at 8 and actually a plateau in the quality plot (orange arrows).
 
-![](docs/screenshot7_parameter_quality_plot.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot7_parameter_quality_plot.png)
 
 For further optimization, we re-configure the algorithm and set a new starting point for optimization of the parameter to 8.
 Afterwards, we restart the optimization. It will then optimize the settings again from the new starting point.
 
-![](docs/screenshot8_start_optimization_again.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot8_start_optimization_again.png)
 
 After another moment, optimization will finish again, potentially leading to an even better result.
 
-![](docs/screenshot9_finished_optimization_again.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot9_finished_optimization_again.png)
 
 ### Step 3: Visualization of results
 
 Make sure the segmentation has high quality by inspecting the result visually. Use the `contour` setting of the labels layer
 and hide/show the outlines of the labeled layer:
 
-![](docs/screenshot10_contours_on.png)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot10_contours_on.png)
 
-![](docs/screenshot11_contours_off.jpg)
+![](https://github.com/haesleinhuepf/napari-workflow-optimizer/raw/main/docs/screenshot11_contours_off.jpg)
 
 ### Optimization Hints
 
