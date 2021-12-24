@@ -10,7 +10,6 @@
 Optimize image processing workflows in napari for segmentation quality
 
 ![img.png](docs/napari-workflow-optimizer.gif)
-[Download full movie (2:00 min)](docs/napari-workflow-optimizer.mp4)
 
 ## Usage
 
@@ -21,6 +20,7 @@ These datasets should be ready. You can reproduce the following procedure by dow
 [scikit-image cells3d example data set](https://scikit-image.org/docs/dev/api/skimage.data.html#skimage.data.cells3d)) and a corresponding 
 [sparse annotation label image](https://github.com/haesleinhuepf/napari-workflow-optimizer/blob/main/demo/membranes_2d_sparse_labels.tif).
 For reproducing the following procedure, also follow the [installation instructions](https://github.com/haesleinhuepf/napari-workflow-optimizer#optimization-hints) below.
+The whole procedure is [also shown in this video](docs/napari-workflow-optimizer.mp4), an extended version of the trailer above.
 
 ### Step 0: Loading data and setting up the workflow
 
