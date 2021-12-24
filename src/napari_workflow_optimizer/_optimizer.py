@@ -1,4 +1,4 @@
-from napari_time_slicer._workflow import Workflow
+from napari_workflows import Workflow
 from scipy.optimize import minimize
 import numpy as np
 
