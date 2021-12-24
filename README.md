@@ -104,6 +104,13 @@ Furthermore, parameter optimization works well if
 * a small number of parameters (a short workflow) are optimized and
 * the reference annotation is prepared carefully.
 
+### Workflow optimization scripting
+
+For optimizing workflows from within a jupyter notebook, check out our [example notebook for optimization using spare labels](https://github.com/haesleinhuepf/napari-workflow-optimizer/blob/main/demo/sparse_label_image_optimizer.ipynb). 
+The examples are more flexible than the graphical user interface and allow for example [optimizing intensity images](https://github.com/haesleinhuepf/napari-workflow-optimizer/blob/main/demo/intensity_image_optimizer.ipynb)
+and [binary images](https://github.com/haesleinhuepf/napari-workflow-optimizer/blob/main/demo/binary_image_optimizer.ipynb).
+The membrane segmentation workflow optimization similar to the one shown above is also available as [jupyter notebook](https://github.com/haesleinhuepf/napari-workflow-optimizer/blob/main/demo/membrane_segmentation.ipynb).
+
 ### Known issues
 
 If you change the workflow architecture after the optimizer window was opened, please re-open it
