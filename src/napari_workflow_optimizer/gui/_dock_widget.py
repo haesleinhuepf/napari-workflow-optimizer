@@ -96,7 +96,7 @@ class WorkflowOptimizer(QWidget):
             self.layout().removeWidget(self._result_plot)
         self.update_viewer()
 
-    def _on_run_click(self):
+    def _on_run_click(self, _for_testing=False):
         if self._optimizer.is_running():
             self._push_button.setText("Cancelling...")
             self._optimizer.cancel()
@@ -176,10 +176,12 @@ class WorkflowOptimizer(QWidget):
         # Start optimization and progress/status updates
         optimize_worker = optimize_runner()
         optimize_worker.yielded.connect(yield_result)
-        optimize_worker.start()
+        if not _for_testing:
+            optimize_worker.start()
         status_worker = status_runner()
         status_worker.yielded.connect(yield_progress)
-        status_worker.start()
+        if not _for_testing:
+            status_worker.start()
 
     def _set_input_images(self):
         # Before we can optimize the workflow, we need to pass input images.
