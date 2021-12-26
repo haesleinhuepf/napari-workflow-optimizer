@@ -65,11 +65,7 @@ def test_optimizer_with_assistant(make_napari_viewer):
 
     optimizer_gui._on_undo_click()
 
-    optimizer_gui._optimizer.optimize(
-                optimizer_gui.labels_select.value.name,
-                optimizer_gui.reference_select.value.data,
-                maxiter=optimizer_gui._maxiter,
-                debug_output=True)
+
 
 
 
