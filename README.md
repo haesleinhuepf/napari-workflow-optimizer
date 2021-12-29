@@ -5,6 +5,7 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/napari-workflow-optimizer.svg?color=green)](https://python.org)
 [![tests](https://github.com/haesleinhuepf/napari-workflow-optimizer/workflows/tests/badge.svg)](https://github.com/haesleinhuepf/napari-workflow-optimizer/actions)
 [![codecov](https://codecov.io/gh/haesleinhuepf/napari-workflow-optimizer/branch/main/graph/badge.svg)](https://codecov.io/gh/haesleinhuepf/napari-workflow-optimizer)
+[![Development Status](https://img.shields.io/pypi/status/napari-workflow-optimizer.svg)](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-workflow-optimizer)](https://napari-hub.org/plugins/napari-workflow-optimizer)
 
 Optimize image processing workflows in napari for segmentation quality
