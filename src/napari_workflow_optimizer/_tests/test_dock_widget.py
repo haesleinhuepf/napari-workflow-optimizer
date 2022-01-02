@@ -41,6 +41,7 @@ def test_optimizer_with_assistant(make_napari_viewer):
     ])
 
     viewer.add_image(image)
+    labels_layer = viewer.add_image(image)
 
     from napari_pyclesperanto_assistant._categories import CATEGORIES
     assistant._activate(CATEGORIES.get("Label"))
@@ -64,6 +65,18 @@ def test_optimizer_with_assistant(make_napari_viewer):
     optimizer_gui._on_run_click(_for_testing=True)
 
     optimizer_gui._on_undo_click()
+
+    optimizer_gui._optimizer._iteration = [1, 2]
+    optimizer_gui._optimizer._quality = [0.1, 0.2]
+    optimizer_gui._plot_quality()
+
+    num_dw = len(viewer.window._dock_widgets)
+    from napari_workflow_optimizer.gui._dock_widget import PlotParameterWidget
+    plot_parameter_gui = PlotParameterWidget(optimizer_gui._optimizer, "voronoi_otsu_labeling", "spot_sigma", labels_layer.name, labels_layer, 0)
+
+    viewer.window.add_dock_widget(plot_parameter_gui)
+    assert len(viewer.window._dock_widgets) == num_dw + 1
+
 
 
 
