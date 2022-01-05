@@ -57,8 +57,7 @@ class WorkflowOptimizer(QWidget):
 
         self._live_update_checkbox = QCheckBox("Live-update")
         self._live_update_checkbox.setToolTip("This updates the segmentation result in the viewer while optimization.\nActivating live-update makes the optimization \nvery slow but potentially nice to look at.")
-        # todo: reactivate checkbox when it's save
-        # self.layout().addWidget(self._live_update_checkbox)
+        self.layout().addWidget(self._live_update_checkbox)
         self.layout().addWidget(vertical_widget(QLabel("Number of iterations"), self.maxiter_select.native))
         self.layout().addWidget(vertical_widget(self._push_button, self._undo_button))
         self.layout().setSpacing(10)
