@@ -131,9 +131,6 @@ class WorkflowOptimizer(QWidget):
                 debug_output=True)
 
         # Update progress/status in a separate thread
-        from napari.utils import progress
-        self._progress_reporter = progress(total=self.maxiter_select.value)
-
         @thread_worker
         def status_runner():
             while True:
@@ -141,7 +138,7 @@ class WorkflowOptimizer(QWidget):
                 is_running = self._optimizer.is_running()
                 yield is_running
                 if is_running and not self._optimizer.is_cancelling():
-                    self._push_button.setText("Cancel (" + str(self._iteration_count) + "/" + str(self._maxiter) + ")")
+                    pass
                 else:
                     return
 
@@ -150,10 +147,11 @@ class WorkflowOptimizer(QWidget):
         def yield_progress(is_running):
             #print("Update status")
             if is_running:
-                self._progress_reporter.set_description("Optimization")
+                if not self._optimizer.is_cancelling():
+                    self._push_button.setText("Cancel (" + str(self._iteration_count) + "/" + str(self._maxiter) + ")")
+
                 _, quality = self._optimizer.get_plot()
                 if self._iteration_count != len(quality):
-                    self._progress_reporter.update(len(quality) - self._iteration_count)
                     self._iteration_count = len(quality)
                     self._plot_quality()
                     if self._live_update_checkbox.isChecked():
@@ -166,7 +164,6 @@ class WorkflowOptimizer(QWidget):
             self._optimizer.set_numeric_parameters(best_result)
             self._plot_quality()
             self._push_button.setText("Start optimization again")
-            self._progress_reporter.close()
 
             self._undo_button.setVisible(True)
             self._enable_gui(True)
