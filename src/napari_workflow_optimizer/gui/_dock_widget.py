@@ -203,13 +203,8 @@ class WorkflowOptimizer(QWidget):
         self.layout().addWidget(self._result_plot)
 
     def update_viewer(self):
-        WIDGET_KEY = "magic_gui_widget"
-
         def find_widget(parent, name):
-            if hasattr(parent, name):
-                return getattr(parent, name)
-
-            from napari_pyclesperanto_assistant._gui._category_widget import category_args_numeric
+            from napari_assistant._gui._category_widget import category_args_numeric
             for n in category_args_numeric:
                 if hasattr(parent, n):
                     widget = getattr(parent, n)

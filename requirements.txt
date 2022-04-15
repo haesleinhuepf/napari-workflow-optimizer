@@ -3,4 +3,5 @@
 # See also: https://caremad.io/posts/2013/07/setup-vs-requirement/
 
 napari-workflows
+napari-assistant>=0.1.9
 -e .
