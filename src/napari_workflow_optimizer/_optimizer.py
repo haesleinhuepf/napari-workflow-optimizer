@@ -310,6 +310,9 @@ class JaccardLabelImageOptimizer(Optimizer):
         overlap[is_zero] = 0
         iou = overlap / divisor
 
+        # ignore background
+        iou = iou[1:, 1:]
+
         max_jacc = iou.max(axis=1)
 
         quality = max_jacc.mean()
