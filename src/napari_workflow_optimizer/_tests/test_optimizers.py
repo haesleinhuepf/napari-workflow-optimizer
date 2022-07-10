@@ -87,4 +87,4 @@ def test_sparse_label_image_optimizer():
 
     result = w.get("labeled")
 
-    assert abs(result.max() - 90) < 2  # accept an error of 2 in object count
+    assert abs(result.max() - 122) < 2  # accept an error of 2 in object count
