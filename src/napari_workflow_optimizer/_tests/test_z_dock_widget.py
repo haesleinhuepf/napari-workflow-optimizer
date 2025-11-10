@@ -22,7 +22,7 @@ def test_optimizer_with_assistant(make_napari_viewer):
     viewer = make_napari_viewer()
 
     # Add Assistant and configure workflow
-    from napari_pyclesperanto_assistant import Assistant
+    from napari_assistant import Assistant
     assistant = Assistant(viewer)
 
     num_dw = len(viewer.window._dock_widgets)
@@ -43,7 +43,7 @@ def test_optimizer_with_assistant(make_napari_viewer):
     viewer.add_image(image)
     labels_layer = viewer.add_image(image)
 
-    from napari_pyclesperanto_assistant._categories import CATEGORIES
+    from napari_assistant._categories import CATEGORIES
     assistant._activate(CATEGORIES.get("Label"))
 
     # Add optimizer and optimize workflow
